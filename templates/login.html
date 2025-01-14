@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <title>Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form-signin">
+            <h2 class="text-center">Login</h2>
+            <form method="POST" action="{{ url_for('login') }}">
+                <!-- Include CSRF token -->
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    <label for="username">Username<span class="text-danger">*</span></label>
+                    {{ form.username(class="form-control", id="username", required=True) }}
+                </div>
+                <div class="form-group">
+                    <label for="password">Password<span class="text-danger">*</span></label>
+                    {{ form.password(class="form-control", id="password", required=True) }}
+                </div>
+
+                {% if login_error %}
+                    <!-- Display error message if login fails -->
+                    <div class="alert alert-danger mt-3" role="alert">
+                        {{ login_error }}
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <p><a href="/forgot-password" class="btn btn-link">Forgot Password?</a></p>
+                <a href="/signup" class="btn btn-link">Don't have an account? Signup</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+</html>

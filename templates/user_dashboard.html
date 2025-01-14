@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <title>User Dashboard</title>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <h2 class="text-center">Welcome, {{ user.first_name }} {{ user.last_name }}</h2>
+
+            <div class="row">
+                <!-- Profile Picture -->
+                <div class="col-md-4 text-center">
+                    <img src="{{ url_for('static', filename=user.profile_picture.replace('\\', '/')) if user.profile_picture else url_for('static', filename='images/default_profile_pic.png') }}"
+                    alt="Profile Picture"
+                    class="img-fluid rounded"
+                    width="250">
+                </div>
+
+
+                <!-- User Details -->
+                <div class="col-md-8">
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Username:</strong> {{ user.username }}</li>
+                        <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+                        <li class="list-group-item"><strong>Address:</strong> {{ user.address_line1 }}, {{ user.city }}, {{ user.state }} - {{ user.pincode }}</li>
+                        <li class="list-group-item"><strong>User Type:</strong> {{ user.user_type }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="/edit-profile" class="btn btn-secondary">Edit Profile</a>
+            </div>
+
+            <!-- Delete Account Button -->
+            <div class="text-center mt-3">
+                <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account?')">
+                <button type="submit" class="btn btn-danger">Delete Account</button>
+                </form>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="text-center mt-3">
+                <form action="{{ url_for('logout') }}" method="POST">
+                    <button type="submit" class="btn btn-warning">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <title>Signup</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form-signin">
+            <h2 class="text-center">Signup</h2>
+            <form method="POST" enctype="multipart/form-data" action="{{ url_for('signup') }}">
+                <!-- Include CSRF token -->
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group">
+                    <label for="first_name">First Name<span class="text-danger">*</span></label>
+                    {{ form.first_name(class="form-control", id="first_name", required=True) }}
+                    {% if form.first_name.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.first_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name<span class="text-danger">*</span></label>
+                    {{ form.last_name(class="form-control", id="last_name", required=True) }}
+                    {% if form.last_name.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.last_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="profile_picture">Profile Picture<span class="text-danger">*</span></label>
+                    {{ form.profile_picture(class="form-control", id="profile_picture") }}
+                    {% if form.profile_picture.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.profile_picture.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="username">Username<span class="text-danger">*</span></label>
+                    {{ form.username(class="form-control", id="username", required=True) }}
+                    {% if form.username.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="email">Email<span class="text-danger">*</span> </label>
+                    {{ form.email(class="form-control", id="email", required=True) }}
+                    {% if form.email.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="password">Password<span class="text-danger">*</span></label>
+                    {{ form.password(class="form-control", id="password", required=True) }}
+                    {% if form.password.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password<span class="text-danger">*</span></label>
+                    {{ form.confirm_password(class="form-control", id="confirm_password", required=True) }}
+                    {% if form.confirm_password.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.confirm_password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="address_line1">Address Line<span class="text-danger">*</span></label>
+                    {{ form.address_line1(class="form-control", id="address_line1", required=True) }}
+                    {% if form.address_line1.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.address_line1.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="city">City<span class="text-danger">*</span></label>
+                    {{ form.city(class="form-control", id="city", required=True) }}
+                    {% if form.city.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.city.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="state">State<span class="text-danger">*</span></label>
+                    {{ form.state(class="form-control", id="state", required=True) }}
+                    {% if form.state.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.state.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="pincode">Pincode<span class="text-danger">*</span></label>
+                    {{ form.pincode(class="form-control", id="pincode", required=True) }}
+                    {% if form.pincode.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.pincode.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="user_type">User Type<span class="text-danger">*</span></label>
+                    {{ form.user_type(class="form-control", id="user_type", required=True) }}
+                    {% if form.user_type.errors %}
+                        <ul class="text-danger">
+                            {% for error in form.user_type.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Signup</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="/login" class="btn btn-link">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
