@@ -4,6 +4,7 @@ import re
 from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user, LoginManager, login_user
+from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import StringField, PasswordField, FileField, SelectField, SubmitField
@@ -19,6 +20,8 @@ from wtforms import ValidationError
 app = Flask(__name__)
 
 load_dotenv()
+print("DATABASE_URL:", os.getenv('DATABASE_URL'))
+
 
 # Set the secret key for session management
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a7f5b8f8e8c9d2f3b9e1e8f9b8a8e8a2')
@@ -45,6 +48,11 @@ def load_user(user_id):
 
 # Initialize SQLAlchemy
 db.init_app(app)
+
+
+# Initialize Flask-Migrate
+migrate = Migrate(app, db)
+
 
 # Set the upload folder for profile pictures
 # Initialize the upload folder for profile and blog images
