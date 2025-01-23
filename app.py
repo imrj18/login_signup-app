@@ -22,7 +22,6 @@ app = Flask(__name__)
 load_dotenv()
 #print("DATABASE_URL:", os.getenv('DATABASE_URL'))
 
-
 # Set the secret key for session management
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a7f5b8f8e8c9d2f3b9e1e8f9b8a8e8a2')
 
