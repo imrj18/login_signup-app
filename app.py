@@ -24,7 +24,7 @@ load_dotenv()
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a7f5b8f8e8c9d2f3b9e1e8f9b8a8e8a2')
 
 # Database configuration
-DATABASE_URL = os.getenv('DATABASE_URL', 'fallback_connection_string')
+DATABASE_URL = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
