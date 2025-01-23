@@ -1,24 +1,31 @@
 import os
 import re
+
+from dotenv import load_dotenv
 from flask import Flask, render_template, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user, LoginManager, login_user
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed
 from wtforms import StringField, PasswordField, FileField, SelectField, SubmitField
+from wtforms.fields.simple import TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Length
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from models import User, db
+from models import User, db, Blog
 from wtforms.validators import Regexp
 from wtforms import ValidationError
 
 # Initialize the Flask app
 app = Flask(__name__)
 
+load_dotenv()
+
 # Set the secret key for session management
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a7f5b8f8e8c9d2f3b9e1e8f9b8a8e8a2')
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+DATABASE_URL = os.getenv('DATABASE_URL', 'fallback_connection_string')
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize LoginManager
@@ -40,11 +47,16 @@ def load_user(user_id):
 db.init_app(app)
 
 # Set the upload folder for profile pictures
-app.config['UPLOAD_FOLDER'] = os.path.join('static', 'images')
+# Initialize the upload folder for profile and blog images
+app.config['UPLOAD_FOLDER_USER'] = os.path.join('static', 'images', 'user')
+app.config['UPLOAD_FOLDER_BLOG'] = os.path.join('static', 'images', 'blog')
 
-# Create the upload folder if it doesn't exist
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+# Ensure the upload folders exist
+if not os.path.exists(app.config['UPLOAD_FOLDER_USER']):
+    os.makedirs(app.config['UPLOAD_FOLDER_USER'])
+
+if not os.path.exists(app.config['UPLOAD_FOLDER_BLOG']):
+    os.makedirs(app.config['UPLOAD_FOLDER_BLOG'])
 
 # Create all tables within app context
 with app.app_context():
@@ -86,6 +98,28 @@ class SignupForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
 
+class BlogPostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    image = FileField('Image')
+    category = SelectField('Category', choices=[('Mental Health', 'Mental Health'),
+                                                ('Heart Disease', 'Heart Disease'),
+                                                ('Covid19', 'Covid19'),
+                                                ('Immunization', 'Immunization')], validators=[DataRequired()])
+    summary = StringField('Summary', validators=[DataRequired()])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    draft = BooleanField('Save as Draft')
+
+
+class EditBlogForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    image = FileField('Image', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    category = SelectField('Category', choices=[('Mental Health', 'Mental Health'), ('Heart Disease', 'Heart Disease'), ('Covid19', 'Covid19'), ('Immunization', 'Immunization')])
+    summary = TextAreaField('Summary', validators=[DataRequired(), Length(max=300)])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    draft = BooleanField('Save as Draft')
+    submit = SubmitField('Update Blog')
+
+
 # Route for signup
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -110,8 +144,8 @@ def signup():
             # Handle profile picture upload
             if profile_picture:
                 filename = secure_filename(profile_picture.filename)
-                profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                profile_picture_path = os.path.join('images', filename)  # Store relative path
+                profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER_USER'], filename))
+                profile_picture_path = os.path.join('images', 'user', filename)  # Store relative path
             else:
                 profile_picture_path = None
 
@@ -169,7 +203,16 @@ def home():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    # Fetch the user data from the database
     user = db.session.get(User, current_user.id)
+
+    # Debugging: Print user information to check if the user is fetched correctly
+    if user:
+        print(f"User ID: {user.id}, User Type: {user.user_type}")
+    else:
+        flash('User not found!', 'danger')
+        return redirect(url_for('login'))
+
     return render_template('user_dashboard.html', user=user)
 
 
@@ -224,6 +267,162 @@ def logout():
     session.clear()  # Clear the session to log the user out
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))  # Redirect to login page
+
+
+@app.route('/create_blog', methods=['GET', 'POST'])
+@login_required
+def create_blog():
+    if current_user.user_type != 'Doctor':
+        flash('You do not have permission to create blog posts.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    form = BlogPostForm()
+
+    if form.validate_on_submit():
+        title = form.title.data
+        image = form.image.data
+        category = form.category.data
+        summary = form.summary.data
+        content = form.content.data
+        draft = form.draft.data
+
+        if image:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER_BLOG'], filename))
+            image_path = os.path.join('images', 'blog', filename)  # Store relative path
+        else:
+            image_path = None
+
+        # Create a new blog post
+        new_blog = Blog(
+            title=title,
+            image=image_path,
+            category=category,
+            summary=summary,
+            content=content,
+            draft=draft,
+            author=current_user
+        )
+
+        try:
+            db.session.add(new_blog)
+            db.session.commit()
+            flash('Blog post created successfully!', 'success')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error occurred: {str(e)}', 'danger')
+
+    return render_template('create_blog.html', form=form)
+
+
+@app.route('/blogs')
+@login_required
+def view_blogs():
+    categories = ['Mental Health', 'Heart Disease', 'Covid19', 'Immunization']
+    selected_category = request.args.get('category')  # Get the selected category from the query parameters
+
+    if current_user.user_type == 'Doctor':
+        # Show all blogs (drafts and published) for the doctor
+        query = Blog.query.filter((Blog.draft == False) | (Blog.user_id == current_user.id))
+    else:
+        # Non-doctor users see only published blogs
+        query = Blog.query.filter_by(draft=False)
+
+    if selected_category:  # Filter by selected category if provided
+        query = query.filter_by(category=selected_category)
+
+    blogs = query.order_by(Blog.date_posted.desc()).all()
+
+    return render_template('view_blogs.html', blogs=blogs, categories=categories, selected_category=selected_category)
+
+
+@app.route('/blog/<int:blog_id>')
+@login_required
+def view_blog(blog_id):
+
+    blog = Blog.query.get_or_404(blog_id)
+    return render_template('view_blog.html', blog=blog)
+
+
+@app.route('/blogs/<category>')
+@login_required
+def view_blogs_by_category(category):
+    if current_user.user_type != 'Patient':
+        return redirect(url_for('view_blogs'))
+
+    blogs = Blog.query.filter_by(category=category, draft=False).order_by(Blog.date_posted.desc()).all()
+    return render_template('view_blogs.html', blogs=blogs, category=category)
+
+
+@app.route('/blogs/all')
+@login_required
+def view_all_blogs():
+    if current_user.user_type == 'Patient' or current_user.user_type == 'Doctor':
+        # Fetch all blogs (published) for doctors
+        blogs = Blog.query.filter_by(draft=False).order_by(Blog.date_posted.desc()).all()
+        return render_template('view_blogs.html', blogs=blogs)
+    else:
+        return redirect(url_for('home'))
+
+
+# Route to view only the doctor's own blogs
+@app.route('/blogs/my')
+@login_required
+def view_my_blogs():
+    if current_user.user_type == 'Doctor':
+        # Fetch only the blogs authored by the logged-in doctor
+        blogs = Blog.query.filter_by(user_id=current_user.id, draft=False).order_by(Blog.date_posted.desc()).all()
+        return render_template('view_blogs.html', blogs=blogs)
+    else:
+        return redirect(url_for('home'))
+
+
+@app.route('/draft')
+@login_required
+def view_draft():
+    if current_user.user_type == 'Doctor':
+        # Fetch only the blogs authored by the logged-in doctor
+        blogs = Blog.query.filter_by(user_id=current_user.id, draft=True).order_by(Blog.date_posted.desc()).all()
+        return render_template('draft_blog.html', blogs=blogs)
+    else:
+        return redirect(url_for('home'))
+
+
+@app.route('/edit_blog/<int:blog_id>', methods=['GET', 'POST'])
+@login_required
+def edit_blog(blog_id):
+    blog = Blog.query.get_or_404(blog_id)
+
+    # Ensure the current user is the author of the blog
+    if blog.user_id != current_user.id:
+        flash('You do not have permission to edit this blog.', 'danger')
+        return redirect(url_for('view_my_blogs'))
+
+    form = EditBlogForm(obj=blog)  # Populate form with current blog data
+
+    if form.validate_on_submit():
+        blog.title = form.title.data
+        blog.category = form.category.data
+        blog.summary = form.summary.data
+        blog.content = form.content.data
+        blog.draft = form.draft.data
+
+        # Handle the image update
+        if form.image.data:
+            filename = secure_filename(form.image.data.filename)
+            form.image.data.save(os.path.join(app.config['UPLOAD_FOLDER_BLOG'], filename))
+            blog.image = os.path.join('images', 'blog', filename)
+
+        try:
+            db.session.commit()
+            flash('Blog updated successfully!', 'success')
+            return redirect(url_for('view_my_blogs'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error occurred: {str(e)}', 'danger')
+
+    return render_template('edit_blog.html', form=form, blog=blog)
 
 
 if __name__ == '__main__':

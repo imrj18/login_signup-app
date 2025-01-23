@@ -15,12 +15,12 @@
             <div class="row">
                 <!-- Profile Picture -->
                 <div class="col-md-4 text-center">
+                <!-- Display Profile Picture -->
                     <img src="{{ url_for('static', filename=user.profile_picture.replace('\\', '/')) if user.profile_picture else url_for('static', filename='images/default_profile_pic.png') }}"
                     alt="Profile Picture"
                     class="img-fluid rounded"
                     width="250">
                 </div>
-
 
                 <!-- User Details -->
                 <div class="col-md-8">
@@ -33,23 +33,38 @@
                 </div>
             </div>
 
-<!--            <div class="text-center mt-3">-->
-<!--                <a href="/edit-profile" class="btn btn-secondary">Edit Profile</a>-->
-<!--            </div>-->
+            <!-- Blog Buttons -->
+            {% if user.user_type == 'Doctor' %}
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('create_blog') }}" class="btn btn-primary btn-block">Create Blog</a>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('view_my_blogs') }}" class="btn btn-primary btn-block">My Blogs</a>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('view_draft') }}" class="btn btn-primary btn-block">Draft Blogs</a>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('view_all_blogs') }}" class="btn btn-secondary btn-block">View All Blogs</a>
+                </div>
+            {% elif user.user_type == 'Patient' %}
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('view_all_blogs') }}" class="btn btn-info">View Blogs</a>
+                </div>
+            {% endif %}
 
+            <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Delete Account Button -->
-            <div class="text-center mt-3">
                 <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account?')">
-                <button type="submit" class="btn btn-danger">Delete Account</button>
+                    <button type="submit" class="btn btn-danger">Delete Account</button>
                 </form>
-            </div>
 
             <!-- Logout Button -->
-            <div class="text-center mt-3">
                 <form action="{{ url_for('logout') }}" method="POST">
                     <button type="submit" class="btn btn-warning">Logout</button>
                 </form>
             </div>
+
         </div>
     </div>
 </body>

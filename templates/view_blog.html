@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ blog.title }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .blog-banner {
+            width: 100%;
+            height: 300px; /* Fixed height for the banner */
+            object-fit: cover; /* Ensures the image covers the banner area */
+            border-radius: 0; /* No rounded corners for a banner effect */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional shadow for aesthetics */
+        }
+
+        .blog-content {
+            margin-top: 20px;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .blog-container {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .blog-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container blog-container">
+        <div class="blog-header">
+            <h1>{{ blog.title }}</h1>
+            <p class="text-muted">Category: {{ blog.category }} | Posted by {{ blog.author.first_name }} {{ blog.author.last_name }}</p>
+        </div>
+
+        {% if blog.image %}
+            <div class="text-center">
+                <img src="{{ url_for('static', filename=blog.image.replace('\\', '/')) if blog.image else url_for('static', filename='images/default_blog_pic.png') }}">
+            </div>
+        {% else %}
+            <p class="text-center text-muted">No image available for this blog.</p>
+        {% endif %}
+
+        <div class="blog-content">
+            <h3>Summary</h3>
+            <p>{{ blog.summary }}</p>
+
+            <h3>Content</h3>
+            <p>{{ blog.content }}</p>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-4">Back to Dashboard</a>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <title>Edit Blog Post</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="edit-blog">
+            <h2 class="mb-4">Edit Blog Post</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    {{ form.title(class="form-control", id="title", value=blog.title) }}
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Image</label>
+                    {% if blog.image %}
+                        <div class="mb-3">
+                            <img src="{{ url_for('static', filename=blog.image) }}" alt="Blog Image" class="img-thumbnail" width="300">
+                        </div>
+                    {% endif %}
+                    {{ form.image(class="form-control-file", id="image") }}
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    {{ form.category(class="form-control", id="category", value=blog.category) }}
+                </div>
+
+                <div class="form-group">
+                    <label for="summary">Summary</label>
+                    {{ form.summary(class="form-control", id="summary", value=blog.summary) }}
+                </div>
+
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    {{ form.content(class="form-control", id="content", rows="5") }}
+                </div>
+
+                <div class="form-group form-check">
+                    <label for="draft" class="form-check-label">
+                        {{ form.draft(class="form-check-input", id="draft", checked=blog.draft) }} Save as Draft
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <!-- Back Button -->
+                    <a href="{{ url_for('view_my_blogs') }}" class="btn btn-secondary ml-2">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
