@@ -1,6 +1,6 @@
-# Login-Signup App
+# Login-Signup and Blog System App
 
-This is a simple **Login and Signup** web application built using **Python**, **Flask**, and **SQLite** for the backend. The app allows users to register, log in, and manage their sessions. The passwords are securely hashed using the PBKDF2 encryption algorithm.
+This is a web application that integrates a **Login and Signup** system with a **Blog Management System** built using **Python**, **Flask**, and **MySQL** for the backend. Users can register, log in, and manage their sessions. Doctors can create and manage blog posts, while patients can view categorized blogs. Passwords are securely hashed using the PBKDF2 encryption algorithm.
 
 ## Table of Contents
 1. [Features](#features)
@@ -14,17 +14,26 @@ This is a simple **Login and Signup** web application built using **Python**, **
 
 ## Features
 
-- **User Authentication**: Users can sign up with their username and password.
-- **Login & Logout**: Once registered, users can log in and log out.
-- **Password Hashing**: Passwords are stored securely using the **PBKDF2** encryption algorithm.
-- **Session Management**: The app keeps track of the user's login state using Flask sessions.
-- **Responsive UI**: Built using **Bootstrap** for a responsive user interface.
+### User Authentication
+- **Signup**: Users can register with their details.
+- **Login & Logout**: Registered users can log in and manage sessions.
+- **Password Hashing**: Secure storage using the **PBKDF2** encryption algorithm.
+- **Session Management**: Tracks user login state using Flask sessions.
+
+### Blog Management System
+- **Doctors**:
+  - Upload blog posts with the following fields: Title, Image, Category, Summary, and Content.
+  - Mark blog posts as drafts during upload.
+  - View a list of all posts uploaded by them.
+- **Patients**:
+  - View a list of published blog posts (not marked as drafts).
+  - Posts are categorized with titles, images, and truncated summaries (if longer than 15 words).
 
 ## Tech Stack
 
 - **Backend**: Python, Flask
 - **Frontend**: HTML, CSS, Bootstrap
-- **Database**: SQLite (File-based database)
+- **Database**: MySQL
 - **Password Encryption**: PBKDF2 (Password-Based Key Derivation Function 2)
 - **Session Management**: Flask Sessions
 - **Version Control**: Git
@@ -37,6 +46,7 @@ Before getting started, ensure you have the following software installed:
 
 - **Python 3.x**: [Install Python](https://www.python.org/downloads/)
 - **pip**: Python’s package manager (comes with Python 3.x)
+- **MySQL**: [Install MySQL](https://dev.mysql.com/downloads/installer/)
 - **Virtual Environment (optional but recommended)**: Isolates project dependencies.
 
 ### Step-by-Step Installation
@@ -72,13 +82,30 @@ Before getting started, ensure you have the following software installed:
     pip install -r requirements.txt
     ```
 
-4. **Set up the Database**:
+4. **Configure the Database**:
 
-    The app uses an SQLite database. The database will be created automatically when you run the app for the first time. 
+    Update your `.env` file with your MySQL credentials (ensure the `.env` file is not pushed to version control):
 
-    If you wish to manually create it or need more details, the database file is stored in `app.db`.
+    ```env
+    DB_URI=mysql://<username>:<password>@localhost/<database_name>
+    ```
 
-5. **Run the Application**:
+    Example:
+    ```env
+    DB_URI=mysql://root:password@localhost/login_signup
+    ```
+
+5. **Run Database Migrations**:
+
+    Set up the database schema using Flask-Migrate:
+
+    ```bash
+    flask db init
+    flask db migrate
+    flask db upgrade
+    ```
+
+6. **Run the Application**:
 
     After installation, run the app using the following command:
 
@@ -90,16 +117,28 @@ Before getting started, ensure you have the following software installed:
 
 ## How to Use
 
+### User Features
 1. **Signup**:
     - Go to the **Signup** page (`/signup`).
-    - Enter a username and password to register a new account.
-   
+    - Enter a username, email, password, and other details to register a new account.
+
 2. **Login**:
     - Go to the **Login** page (`/login`).
     - Enter your username and password to log in.
-   
+
 3. **Logout**:
     - After logging in, you can log out at any time by clicking the **Logout** button.
+
+### Blog Features
+1. **Doctors**:
+    - Navigate to the blog management section.
+    - Create new blog posts with a title, image, category, summary, and content.
+    - Mark posts as drafts during upload.
+    - View all blogs they have uploaded.
+
+2. **Patients**:
+    - Browse the blog section to view published posts categorized with titles, images, and summaries.
+    - Summaries longer than 15 words are truncated.
 
 ## Project Structure
 
@@ -112,18 +151,25 @@ login_signup-app/
 ├── templates/            # HTML files for rendering pages
 │   ├── home.html         # Home page after login
 │   ├── login.html        # Login page
-│   └── signup.html       # Signup page
+│   ├── signup.html       # Signup page
+│   ├── create_blog.html  # Blog creation page
+│   ├── edit_blog.html    # Blog editing page
+│   ├── view_blog.html    # Single blog view page
+│   └── view_blogs.html   # All blogs view page for patients
 ├── static/               # Static files like CSS and JS
 │   └── style.css         # Custom CSS styles
+├── models.py             # Database models
 ├── requirements.txt      # List of required packages (Flask, Flask-Session, etc.)
+├── migrations/           # Database migration scripts
 └── .gitignore            # Git ignore file to exclude unnecessary files
 ```
 
 ### Key Files and Their Functions
 
 - **app.py**: Contains the main Flask routes and logic for the app. It handles the user authentication, session management, and routing.
-- **templates/ folder**: Contains the HTML files that define the structure of each page (home, login, signup).
-- **static/ folder**: Contains static assets such as CSS, JavaScript, and images. 
+- **models.py**: Defines the database models for users and blogs.
+- **templates/ folder**: Contains the HTML files that define the structure of each page (login, signup, blog management, etc.).
+- **static/ folder**: Contains static assets such as CSS, JavaScript, and images.
 
 ## Contributing
 
@@ -142,4 +188,5 @@ This project is licensed under the MIT License.
 
 - **Flask Documentation**: [Flask Docs](https://flask.palletsprojects.com/)
 - **Bootstrap**: [Bootstrap Docs](https://getbootstrap.com/)
+
 
