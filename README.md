@@ -9,7 +9,6 @@ This is a web application that integrates a **Login and Signup** system with a *
 4. [How to Use](#how-to-use)
 5. [Project Structure](#project-structure)
 6. [Contributing](#contributing)
-7. [License](#license)
 8. [Acknowledgements](#acknowledgements)
 
 ## Features
