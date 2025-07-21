@@ -180,10 +180,6 @@ login_signup-app/
 5. Push to your branch: `git push origin feature-name`
 6. Submit a pull request.
 
-## License
-
-This project is licensed under the MIT License.
-
 ## Acknowledgements
 
 - **Flask Documentation**: [Flask Docs](https://flask.palletsprojects.com/)
